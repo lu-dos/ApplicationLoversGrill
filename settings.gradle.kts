@@ -22,7 +22,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Lover" s Food"
+rootProject.name = "Lover's Food"
 include(":app")
 
 //okok
