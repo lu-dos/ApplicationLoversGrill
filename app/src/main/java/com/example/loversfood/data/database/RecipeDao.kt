@@ -16,6 +16,9 @@ interface RecipeDao {
     @Query("SELECT * FROM recipes WHERE name LIKE '%' || :query || '%' LIMIT :limit OFFSET :offset")
     suspend fun searchRecipesPaged(query: String, limit: Int, offset: Int): List<RecipeEntity>
 
+    @Query("SELECT * FROM recipes WHERE category = :category AND name LIKE '%' || :query || '%' LIMIT :limit OFFSET :offset")
+    suspend fun searchRecipesByCategoryPaged(category: String, query: String, limit: Int, offset: Int): List<RecipeEntity>
+
     @Query("SELECT * FROM recipes WHERE id = :id")
     suspend fun getRecipeById(id: String): RecipeEntity?
 

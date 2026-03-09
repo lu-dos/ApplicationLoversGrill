@@ -22,6 +22,7 @@ import com.example.loversfood.ui.ViewModelFactory
 import com.example.loversfood.ui.components.CategoryFilter
 import com.example.loversfood.ui.components.SearchBar
 import com.example.loversfood.ui.details.RecipeDetailsActivity
+import com.example.loversfood.ui.theme.LoversFoodTheme
 
 class RecipeListActivity : ComponentActivity() {
 
@@ -32,39 +33,43 @@ class RecipeListActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val recipes by viewModel.recipes.collectAsState()
-            val categories by viewModel.categories.collectAsState()
-            val selectedCategory by viewModel.selectedCategory.collectAsState()
-            val searchQuery by viewModel.searchQuery.collectAsState()
-            val isLoading by viewModel.isLoading.collectAsState()
+            LoversFoodTheme {
+                val recipes by viewModel.recipes.collectAsState()
+                val categories by viewModel.categories.collectAsState()
+                val selectedCategory by viewModel.selectedCategory.collectAsState()
+                val searchQuery by viewModel.searchQuery.collectAsState()
+                val isLoading by viewModel.isLoading.collectAsState()
 
-            Scaffold(
-                topBar = {
-                    Column {
-                        SearchBar(
-                            query = searchQuery,
-                            onQueryChange = { viewModel.onSearchQueryChanged(it) }
-                        )
-                        CategoryFilter(
-                            categories = categories,
-                            selectedCategory = selectedCategory,
-                            onCategorySelected = { viewModel.onCategorySelected(it) }
-                        )
-                    }
-                }
-            ) { padding ->
-                RecipeListContent(
-                    modifier = Modifier.padding(padding),
-                    recipes = recipes,
-                    isLoading = isLoading,
-                    onRecipeClick = { recipe ->
-                        val intent = Intent(this, RecipeDetailsActivity::class.java).apply {
-                            putExtra("RECIPE_ID", recipe.id)
+                Scaffold(
+                    topBar = {
+                        Surface(shadowElevation = 4.dp) {
+                            Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                                SearchBar(
+                                    query = searchQuery,
+                                    onQueryChange = { viewModel.onSearchQueryChanged(it) }
+                                )
+                                CategoryFilter(
+                                    categories = categories,
+                                    selectedCategory = selectedCategory,
+                                    onCategorySelected = { viewModel.onCategorySelected(it) }
+                                )
+                            }
                         }
-                        startActivity(intent)
-                    },
-                    onLoadMore = { viewModel.loadNextPage() }
-                )
+                    }
+                ) { padding ->
+                    RecipeListContent(
+                        modifier = Modifier.padding(padding),
+                        recipes = recipes,
+                        isLoading = isLoading,
+                        onRecipeClick = { recipe ->
+                            val intent = Intent(this, RecipeDetailsActivity::class.java).apply {
+                                putExtra("RECIPE_ID", recipe.id)
+                            }
+                            startActivity(intent)
+                        },
+                        onLoadMore = { viewModel.loadNextPage() }
+                    )
+                }
             }
         }
     }
@@ -80,7 +85,6 @@ fun RecipeListContent(
 ) {
     val listState = rememberLazyListState()
 
-    // Detect if we scrolled to the end
     val shouldLoadMore = remember {
         derivedStateOf {
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
@@ -100,7 +104,7 @@ fun RecipeListContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        itemsIndexed(recipes) { _, recipe ->
+        itemsIndexed(recipes, key = { _, recipe -> recipe.id }) { _, recipe ->
             RecipeItem(recipe = recipe, onClick = { onRecipeClick(recipe) })
         }
 
@@ -125,7 +129,8 @@ fun RecipeItem(recipe: Recipe, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -144,8 +149,16 @@ fun RecipeItem(recipe: Recipe, onClick: () -> Unit) {
                     .padding(start = 16.dp)
                     .weight(1f)
             ) {
-                Text(text = recipe.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = recipe.category, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = recipe.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = recipe.category,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }
