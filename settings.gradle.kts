@@ -24,5 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Lover's Food"
 include(":app")//sui
-
+//suiiiiiiiiiiiiiiiiiiii
 //okok
