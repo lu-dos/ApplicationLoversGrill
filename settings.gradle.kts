@@ -23,6 +23,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Lover's Food"
-include(":app")
+include(":app")//sui
 
 //okok
